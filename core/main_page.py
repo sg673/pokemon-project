@@ -9,6 +9,9 @@ import core.load_data as load_data
 import core.transform_data as transform_data
 import pandas as pd
 import plotly.express as px
+import random_df as rd
+import numpy as np
+
 
 
 def format_type(types: list) -> str:
@@ -111,20 +114,25 @@ def main_page():
         "sp_defense"
     ]].to_frame().T)
     
-    weight_df = generate_random_rows(df, poke_info["pokedex_number"], 5)
+    weight_df = rd.generate_random_rows(df, poke_info["pokedex_number"], 5)
+    poke_info_df = poke_info.to_frame().T
+    fig_df = pd.concat([weight_df, poke_info_df], ignore_index=True)
+    # Add a column to indicate if the row is the selected Pokémon
+    fig_df["highlight"] = fig_df["pokedex_number"].apply(lambda x: "Selected" if x == poke_info["pokedex_number"] else "Other")
     fig = px.bar(
-        x = weight_df["name"],
-        y = weight_df["weight_kg"],
+        fig_df,
+        x = "name",
+        y = "weight_kg",
         labels = {"name": "Name", "weight_kg": "Weight (kg)"},
-        text = "Weight (kg)"
+        text = "weight_kg",
+        color = "highlight",
+        color_discrete_map={"Selected": "Green", "Other": "Blue"},
     )
+    fig.update_layout(xaxis_title="Name", yaxis_title="Weight (kg)", xaxis={'categoryorder': 'total ascending'})
+
     st.plotly_chart(fig)
 
     radar_chart(poke_info)
-
-
-if __name__ == "__main__":
-    main_page()
 
 
 def radar_chart(p1):
@@ -134,3 +142,7 @@ def radar_chart(p1):
     fig.update_traces(fill='toself', line_color='#FF6B6B')
 
     st.plotly_chart(fig)
+
+
+if __name__ == "__main__":
+    main_page()
