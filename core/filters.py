@@ -21,4 +21,7 @@ def filter_by_dual_type(df: pd.DataFrame,
 
 # Filter by status (Legendary/Mythical)
 def filter_by_status(df, status: str) -> pd.DataFrame:
+    '''
+    Filters by status: "Normal", "Sub Legendary", "Legendary"
+    '''
     return df[(df["status"] == status)]

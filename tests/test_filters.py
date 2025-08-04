@@ -14,11 +14,12 @@ dummy_df = pd.DataFrame(
             "Charmander",
             "Squirtle",
             "Pidgey",
+            "Gastrodon",
             "OmegaArmormon Burst Mode",
             "OmegaArmormon Chaos Mode",
         ],
-        "type_1": ["Grass", "Fire", "Water", "Normal", "Normal", "Normal"],
-        "type_2": ["Poison", None, None, "Flying", "Steel", "Steel"],
+        "type_1": ["Grass", "Fire", "Water", "Normal", "Water", "Normal", "Normal"],
+        "type_2": ["Poison", None, None, "Flying", "Ground", "Steel", "Steel"],
     }
 )
 
@@ -39,11 +40,11 @@ class TestFilterByType(unittest.TestCase):
         self.assertEqual(result.iloc[0]["name"], "Pidgey")
 
     def test_filter_by_type_multiple_matches(self):
-        result = filter_by_type(self.df, "Normal")
+        result = filter_by_type(self.df, "Water")
         self.assertEqual(len(result), 2)
 
         names = set(result["name"])
-        expected_names = {"Pidgey", "OmegaArmormon Burst Mode"}
+        expected_names = {"Squirtle", "Gastrodon"}
 
         self.assertEqual(names, expected_names)
 
@@ -58,20 +59,19 @@ class TestFilterByDualTypes(unittest.TestCase):
     def setUp(self):
         self.df = dummy_df.copy()
 
-    def test_filter_by_types(self):
+    def test_filter_by_types_multiple_matches(self):
         result = filter_by_dual_type(self.df, "Normal", "Steel")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result.iloc[0]["name"], "OmegaArmormon Burst Mode")
+        self.assertEqual(len(result), 2)
 
-    def test_filter_by_types_reverse_matches(self):
+        names = set(result["name"])
+        expected_names = {"OmegaArmormon Burst Mode", "OmegaArmormon Chaos Mode"}
+
+        self.assertEqual(names, expected_names)
+
+    def test_filter_by_types_reverse_match(self):
         result = filter_by_dual_type(self.df, "Flying", "Normal")
         self.assertEqual(len(result), 1)
         self.assertEqual(result.iloc[0]["name"], "Pidgey")
-
-    def test_filter_by_types_multiple_matches(self):
-        result = filter_by_type(self.df, "Poison")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result.iloc[0]["name"], "Bulbasaur")
 
     def test_filter_by_type_no_matches(self):
         result = filter_by_type(self.df, "Electric")
