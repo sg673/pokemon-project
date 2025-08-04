@@ -1,9 +1,9 @@
 # Required
-Input Pokémon number from user
+Input Pokémon number from user - Rion
 	- Drop down list with name and number
 	- Accepts typing as well
 
-Display an image of the Pokémon
+Display an image of the Pokémon - Sam
 
 Display a graph of weight and compare to a random selection of other Pokémon
 	- Random number generator
@@ -12,7 +12,8 @@ Display a graph of weight and compare to a random selection of other Pokémon
 
 # Optional
 ## Single Showcase
-Display Pokémon family
+Display Pokémon family - Grant
+Clean Dataset - Grant
 Display stats in a hexagram
 Find and join Pokédex entries
 Find and join first appearance of Pokémon in anime
@@ -20,7 +21,7 @@ Find and join first appearance of Pokémon in anime
 ## Comparison
 Compare two Pokémon
 
-## Data Frame
+## Data Frame - Fuad
 Filter by type
 Filter by status (Legendary/Mythical)
 
