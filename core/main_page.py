@@ -99,7 +99,10 @@ def main_page():
         poke_info[f"type_{i + 1}"]
         for i in range(poke_info["type_number"])
     ]
-    st.markdown(format_type(types), unsafe_allow_html=True)
+    stat1,stat2 = st.columns(2)
+    
+    stat1.markdown(format_type(types), unsafe_allow_html=True)
+    stat2.write(f"**Height:** {poke_info['height_m']} m | **Weight:** {poke_info['weight_kg']} kg")
 
     st.write(" ### Stats")
     st.table(poke_info[[
