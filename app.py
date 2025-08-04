@@ -6,7 +6,7 @@ if __name__ == "__main__":
 
     page_name_to_funcs = {
         "Main Page": main_page.main_page,
-        "Comparison": comparisons.comparisions,
+        "Comparison": comparisons.comparisons,
     }
 
     page_routes = st.sidebar.selectbox(
