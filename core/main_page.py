@@ -4,6 +4,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import requests
 import streamlit as st
 import core.load_data as load_data
 import core.transform_data as transform_data
@@ -49,6 +50,47 @@ def format_type(types: list) -> str:
     return output
 
 
+def get_description(pokemon_id):
+    """
+    Fetches the Pokédex entry for a given Pokémon ID.
+    """
+    url = f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_id}/"
+    response = requests.get(url)
+    if response.status_code != 200:
+        return "Pokédex entry unavailable."
+
+    data = response.json()
+    for entry in data['flavor_text_entries']:
+        if (
+            entry['language']['name'] == 'en'
+            and entry['version']['name'] in [
+                'sword', 'shield', 'scarlet', 'violet'
+            ]
+        ):
+            return (
+                (
+                    entry['flavor_text']
+                    .replace('\n', ' ')
+                    .replace('\f', ' ')
+                    .strip()
+                )
+            )
+    for entry in data['flavor_text_entries']:
+        if entry['language']['name'] == 'en':
+            return entry['flavor_text'].replace('\n', ' ').replace('\f', ' ').strip()
+    return "No English Pokédex entry found."
+
+
+
+def radar_chart(p1):
+    stats = ['hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed']
+
+    fig = px.line_polar(p1, r=p1[stats].values, theta=stats, line_close=True)
+    fig.update_traces(fill='toself', line_color='#FF6B6B')
+
+    st.plotly_chart(fig)
+
+
 def main_page():
     st.title("Pokémon Dataset Explorer")
     # Load the Pokémon data
@@ -79,6 +121,7 @@ def main_page():
 
     with disp1:
         st.header(poke_info["name"])
+        st.write(get_description(poke_info["pokedex_number"]))
     with disp2:
         if variants:
             out = ""
@@ -102,21 +145,16 @@ def main_page():
         poke_info[f"type_{i + 1}"]
         for i in range(poke_info["type_number"])
     ]
-    stat1,stat2 = st.columns(2)
+    stat1, stat2 = st.columns(2)
     
-    stat1.markdown(format_type(types), unsafe_allow_html=True)
-    stat2.write(f"**Height:** {poke_info['height_m']} m | **Weight:** {poke_info['weight_kg']} kg")
+    st.markdown(f"**Height:** {poke_info['height_m']} m")
+    st.markdown(f"**Weight:** {poke_info['weight_kg']} kg")
+    st.markdown(f"**Generation:** {poke_info['generation']}")
+    st.markdown(f"**Total Base Stats:** {poke_info['total_points']}")
 
-    st.write(" ### Stats")
-    st.table(poke_info[[
-        "hp",
-        "attack",
-        "defense",
-        "speed",
-        "sp_attack",
-        "sp_defense"
-    ]].to_frame().T)
-    
+    stat1.markdown(format_type(types), unsafe_allow_html=True)
+    radar_chart(poke_info)
+
     weight_df = rd.generate_random_rows(df, poke_info["pokedex_number"], 5)
     poke_info_df = poke_info.to_frame().T
     fig_df = pd.concat([weight_df, poke_info_df], ignore_index=True)
@@ -132,17 +170,6 @@ def main_page():
         color_discrete_map={"Selected": "Green", "Other": "Blue"},
     )
     fig.update_layout(xaxis_title="Name", yaxis_title="Weight (kg)", xaxis={'categoryorder': 'total ascending'})
-
-    st.plotly_chart(fig)
-
-    radar_chart(poke_info)
-
-
-def radar_chart(p1):
-    stats = ['hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed']
-
-    fig = px.line_polar(p1, r=p1[stats].values, theta=stats, line_close=True)
-    fig.update_traces(fill='toself', line_color='#FF6B6B')
 
     st.plotly_chart(fig)
 
