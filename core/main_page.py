@@ -147,10 +147,10 @@ def main_page():
     ]
     stat1, stat2 = st.columns(2)
     
-    st.markdown(f"**Height:** {poke_info['height_m']} m")
-    st.markdown(f"**Weight:** {poke_info['weight_kg']} kg")
-    st.markdown(f"**Generation:** {poke_info['generation']}")
-    st.markdown(f"**Total Base Stats:** {poke_info['total_points']}")
+    stat2.markdown(f"**Height:** {poke_info['height_m']} m")
+    stat2.markdown(f"**Weight:** {poke_info['weight_kg']} kg")
+    stat2.markdown(f"**Generation:** {poke_info['generation']}")
+    stat2.markdown(f"**Total Base Stats:** {poke_info['total_points']}")
 
     stat1.markdown(format_type(types), unsafe_allow_html=True)
     radar_chart(poke_info)
