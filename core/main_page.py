@@ -9,7 +9,7 @@ import core.load_data as load_data
 import core.transform_data as transform_data
 import pandas as pd
 import plotly.express as px
-import random_df as rd
+import core.random_df as rd
 import numpy as np
 
 

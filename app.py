@@ -1,6 +1,7 @@
 from core import comparisons
 import core.main_page as main_page
 import streamlit as st
+import core
 
 if __name__ == "__main__":
 
