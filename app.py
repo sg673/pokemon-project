@@ -1,4 +1,16 @@
+from core import comparisons
 import core.main_page as main_page
+import streamlit as st
 
 if __name__ == "__main__":
-    main_page.main_page()
+
+    page_name_to_funcs = {
+        "Main Page": main_page.main_page,
+        "Comparison": comparisons.comparisions,
+    }
+
+    page_routes = st.sidebar.selectbox(
+        "Select Page", list(page_name_to_funcs.keys())
+    )
+
+    page_name_to_funcs[page_routes]()
