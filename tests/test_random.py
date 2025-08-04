@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from core.random import generate_random_rows
+from core.random_df import generate_random_rows
 
 # Set up dummy dataframe to test on
 dummy_df = pd.DataFrame(
