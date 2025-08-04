@@ -1,9 +1,4 @@
-import streamlit as st
-import core
-import core.load_data
-import core.transform_data as td
+import core.main_page as main_page
 
-st.title("My First Streamlit App")
-st.write("Hello, Streamlit")
-
-st.dataframe(td.clean_data())
+if __name__ == "__main__":
+    main_page.main_page()
