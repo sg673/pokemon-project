@@ -1,3 +1,4 @@
+# Required
 Input Pokémon number from user
 	- Drop down list with name and number
 	- Accepts typing as well
@@ -9,11 +10,29 @@ Display a graph of weight and compare to a random selection of other Pokémon
 	- 5 others with label used to name
 	- Scatter graph
 
+# Optional
+## Single Showcase
+Display Pokémon family
+Display stats in a hexagram
+Find and join Pokédex entries
+Find and join first appearance of Pokémon in anime
+
+## Comparison
+Compare two Pokémon
+
+## Data Frame
+Filter by type
+Filter by status (Legendary/Mythical)
+
+## Layout
+Work on the layout of the Pokémon display
+
 Pokémon dataset
 	- pokedex_number
 	- name
 	- pre-evolution
 	- generation
+	- status
 	- type_1
 	- type_2
 	- height_m
