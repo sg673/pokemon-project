@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
 import requests
+import plotly.graph_objects as go
+import plotly.express as px
 
 df = pd.read_csv("pokemon.csv")
 
@@ -27,6 +28,7 @@ type_chart = {
     "Steel":     {"Rock": 2, "Ice": 2, "Fairy": 2, "Fire": 0.5, "Water": 0.5, "Electric": 0.5, "Steel": 0.5},
     "Fairy":     {"Fighting": 2, "Dragon": 2, "Dark": 2, "Fire": 0.5, "Poison": 0.5, "Steel": 0.5},
 }
+
 
 def get_pokedex_entry(pokemon_id):
     url = f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_id}/"
@@ -56,33 +58,25 @@ def get_matchup_score(attacker_types, defender_types):
 
 def display_type_vs_type(p1, p2):
     st.subheader("Matchup Between the Two Pokémon")
-
-    p1_types = [p1['type_1']]
-    if pd.notna(p1['type_2']):
-        p1_types.append(p1['type_2'])
-
-    p2_types = [p2['type_1']]
-    if pd.notna(p2['type_2']):
-        p2_types.append(p2['type_2'])
-
+    p1_types = [p1['type_1']] + ([p1['type_2']] if pd.notna(p1['type_2']) else [])
+    p2_types = [p2['type_1']] + ([p2['type_2']] if pd.notna(p2['type_2']) else [])
     a_vs_b = get_matchup_score(p1_types, p2_types)
     b_vs_a = get_matchup_score(p2_types, p1_types)
-
     st.markdown(f"🔺 **{p1['name']} attacking {p2['name']}**: `{a_vs_b}×` effectiveness")
     st.markdown(f"🔻 **{p2['name']} attacking {p1['name']}**: `{b_vs_a}×` effectiveness")
 
-#SIDEBAR BIT
+#SIDEBAR
 st.sidebar.title("Options")
 compare_mode = st.sidebar.checkbox("Compare two Pokémon?", value=False)
 search_mode = st.sidebar.radio("Search mode", ["Name", "Pokédex Number"], horizontal=True)
 
 if search_mode == "Name":
-    pokemon_list = sorted(df['name'].unique().tolist())
+    pokemon_list = sorted(df['name'].unique())
     display_map = {name: name for name in pokemon_list}
 else:
     df_sorted = df.sort_values(by="pokedex_number")
     pokemon_list = df_sorted.apply(lambda row: f"#{int(row['pokedex_number']):03d} {row['name']}", axis=1).tolist()
-    display_map = {f"#{int(row['pokedex_number']):03d} {row['name']}": row['name'] for _, row in df_sorted.iterrows()}
+    display_map = {name: row['name'] for name, row in zip(pokemon_list, df_sorted.to_dict("records"))}
 
 poke1_display = st.sidebar.selectbox("Select First Pokémon", pokemon_list)
 poke2_display = st.sidebar.selectbox("Select Second Pokémon", pokemon_list) if compare_mode else None
@@ -111,8 +105,7 @@ def display_type_matchups(pokemon_row):
     matchup_data = pd.DataFrame({
         "Type": [col.replace("against_", "").capitalize() for col in matchup_cols],
         "Effectiveness": [pokemon_row[col] for col in matchup_cols]
-    })
-    matchup_data = matchup_data.sort_values(by="Effectiveness", ascending=False).reset_index(drop=True)
+    }).sort_values(by="Effectiveness", ascending=False).reset_index(drop=True)
 
     def color_scale(val):
         if val >= 2.0:
@@ -123,43 +116,57 @@ def display_type_matchups(pokemon_row):
             return "background-color: #ccffcc"
         return ""
 
-    styled = matchup_data.style.applymap(color_scale, subset=["Effectiveness"])
-    st.dataframe(styled, use_container_width=True)
+    st.dataframe(matchup_data.style.applymap(color_scale, subset=["Effectiveness"]), use_container_width=True)
 
+#radar stats graph
 def radar_chart(p1, p2):
     stats = ['hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed']
-    p1_stats = p1[stats].values.flatten().tolist()
-    p2_stats = p2[stats].values.flatten().tolist()
+    p1_stats = p1[stats].tolist()
+    p2_stats = p2[stats].tolist()
+    stats += [stats[0]]
+    p1_stats += [p1_stats[0]]
+    p2_stats += [p2_stats[0]]
 
-    labels = stats
-    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False).tolist()
-    angles += angles[:1]
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(r=p1_stats, theta=stats, fill='toself', name=p1['name']))
+    fig.add_trace(go.Scatterpolar(r=p2_stats, theta=stats, fill='toself', name=p2['name']))
+    fig.update_layout(
+        polar=dict(radialaxis=dict(visible=True, range=[0, max(max(p1_stats), max(p2_stats)) + 10])),
+        showlegend=True,
+        title="Stat Comparison"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
-    p1_stats += p1_stats[:1]
-    p2_stats += p2_stats[:1]
+#height and weight scatter grpah
+def height_vs_weight_plot(poke1, df):
+    sample_df = df.sample(30, random_state=1)
+    sample_df = pd.concat([sample_df, pd.DataFrame([poke1])], ignore_index=True)
+    sample_df['highlight'] = sample_df['name'] == poke1['name']
+    sample_df['highlight'] = sample_df['highlight'].map({True: poke1['name'], False: "Other Pokémon"})
 
-    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
-    ax.plot(angles, p1_stats, label=p1['name'])
-    ax.fill(angles, p1_stats, alpha=0.25)
-    ax.plot(angles, p2_stats, label=p2['name'])
-    ax.fill(angles, p2_stats, alpha=0.25)
+    fig = px.scatter(
+        sample_df,
+        x='height_m',
+        y='weight_kg',
+        color='highlight',
+        color_discrete_map={poke1['name']: 'red', "Other Pokémon": 'blue'},
+        hover_name='name',
+        title=f"{poke1['name']}: Compared to Random Pokémon",
+        labels={'height_m': 'Height (m)', 'weight_kg': 'Weight (kg)', 'highlight': 'Pokémon'}
+    )
 
-    ax.set_thetagrids(np.degrees(angles[:-1]), labels)
-    ax.set_title("Stat Comparison")
-    ax.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1))
-    st.pyplot(fig)
-
-#MAIN USER INETRFACE
+    st.plotly_chart(fig, use_container_width=True)
+#MAIN
 st.title("Pokémon Info & Comparison")
 
 if compare_mode:
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader(f"{poke1['name']}")
+        st.subheader(poke1['name'])
         display_pokemon_info(poke1)
         display_type_matchups(poke1)
     with col2:
-        st.subheader(f"{poke2['name']}")
+        st.subheader(poke2['name'])
         display_pokemon_info(poke2)
         display_type_matchups(poke2)
     display_type_vs_type(poke1, poke2)
@@ -167,23 +174,8 @@ if compare_mode:
 else:
     center_col = st.columns([1, 2, 1])[1]
     with center_col:
-        st.subheader(f"{poke1['name']}")
+        st.subheader(poke1['name'])
         display_pokemon_info(poke1, large_image=True)
         display_type_matchups(poke1)
-
-    #HeightVsWeightGraph
     st.subheader("Height vs Weight Comparison")
-    sample_df = df.sample(30, random_state=1)
-    sample_df = pd.concat([sample_df, pd.DataFrame([poke1])], ignore_index=True)
-
-    fig, ax = plt.subplots()
-    ax.scatter(sample_df['height_m'], sample_df['weight_kg'], alpha=0.6, label="Other Pokémon")
-    ax.scatter(poke1['height_m'], poke1['weight_kg'], color='red', label=poke1['name'], s=100)
-    ax.set_xlabel("Height (m)")
-    ax.set_ylabel("Weight (kg)")
-    ax.set_title(f"{poke1['name']}: Compared to Random Pokémon")
-    ax.legend()
-    st.pyplot(fig)
-
-
-
+    height_vs_weight_plot(poke1, df)
