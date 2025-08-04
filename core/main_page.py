@@ -8,6 +8,8 @@ import streamlit as st
 import core.load_data as load_data
 import core.transform_data as transform_data
 import pandas as pd
+# import core.random as random
+import plotly.express as px
 
 
 def format_type(types: list) -> str:
@@ -109,6 +111,15 @@ def main_page():
         "sp_attack",
         "sp_defense"
     ]].to_frame().T)
+    
+    weight_df = generate_random_rows(df, poke_info["pokedex_number"], 5)
+    fig = px.bar(
+        x = weight_df["name"],
+        y = weight_df["weight_kg"],
+        labels = {"name": "Name", "weight_kg": "Weight (kg)"},
+        text = "Weight (kg)"
+    )
+    st.plotly_chart(fig)
 
 
 if __name__ == "__main__":
