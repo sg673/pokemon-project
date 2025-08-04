@@ -1,0 +1,47 @@
+Input Pokémon number from user
+	- Drop down list with name and number
+	- Accepts typing as well
+
+Display an image of the Pokémon
+
+Display a graph of weight and compare to a random selection of other Pokémon
+	- Random number generator
+	- 5 others with label used to name
+	- Scatter graph
+
+Pokémon dataset
+	- pokedex_number
+	- name
+	- pre-evolution
+	- generation
+	- type_1
+	- type_2
+	- height_m
+	- weight_kg
+	- total_points
+	- hp
+	- attack
+	- defense
+	- sp_attack
+	- sp_defense
+	- speed
+	- percentage_male
+	- against_normal
+	- against_fire
+	- against_water
+	- against_electric
+	- against_grass
+	- against_ice
+	- against_fight
+	- against_poison
+	- against_ground
+	- against_flying
+	- against_psychic
+	- against_bug
+	- against_rock
+	- against_ghost
+	- against_dragon
+	- against_dark
+	- against_steel
+	- against_fairy
+
