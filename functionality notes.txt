@@ -64,4 +64,5 @@ Pokémon dataset
 	- against_dark
 	- against_steel
 	- against_fairy
+	- pre-evolution
 
