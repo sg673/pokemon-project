@@ -7,9 +7,7 @@ def load_data():
     returns a DataFrame with the Pokémon data.
     """
     df = pd.read_csv("data/pokemon.csv")
-
-    # Data cleaning
-    df = df.dropna()  # Remove missing values
+    df = df.fillna("N/A")
     return df
 
 
