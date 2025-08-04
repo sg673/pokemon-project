@@ -1,6 +1,4 @@
-import streamlit as st
-import core.load_data as load_data
+import core.main_page as main_page
 
-st.title("My First Streamlit App")
-st.write("Hello, Streamlit")
-
+if __name__ == "__main__":
+    main_page.main_page()
