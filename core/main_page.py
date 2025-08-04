@@ -1,5 +1,13 @@
+# Setup imports to work from root
+# Prevents module not found errors when running from app.py by setting all
+# file relationships to be relative to root
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
 import core.load_data as load_data
+import core.transform_data as transform_data
+import pandas as pd
 
 
 def format_type(types: list) -> str:
@@ -40,7 +48,7 @@ def format_type(types: list) -> str:
 def main_page():
     st.title("Pokémon Dataset Explorer")
     # Load the Pokémon data
-    df = load_data.load_data()
+    df = transform_data.clean_data()
 
     search_type = st.radio("Search by:", ["Pokédex Number", "Name"])
     # Based on the search type, show the appropriate input
