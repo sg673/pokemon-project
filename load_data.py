@@ -9,7 +9,7 @@ def load_data():
     df = pd.read_csv("data/pokemon.csv")
 
     # Data cleaning
-    # df = df.dropna()  # Remove missing values
+    df = df.dropna()  # Remove missing values
     return df
 
 
