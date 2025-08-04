@@ -8,7 +8,6 @@ import streamlit as st
 import core.load_data as load_data
 import core.transform_data as transform_data
 import pandas as pd
-# import core.random as random
 import plotly.express as px
 
 
@@ -121,6 +120,17 @@ def main_page():
     )
     st.plotly_chart(fig)
 
+    radar_chart(poke_info)
+
 
 if __name__ == "__main__":
     main_page()
+
+
+def radar_chart(p1):
+    stats = ['hp', 'attack', 'defense', 'sp_attack', 'sp_defense', 'speed']
+
+    fig = px.line_polar(p1, r=p1[stats].values, theta=stats, line_close=True)
+    fig.update_traces(fill='toself', line_color='#FF6B6B')
+
+    st.plotly_chart(fig)
