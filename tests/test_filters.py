@@ -3,7 +3,7 @@ import pandas as pd
 from core.filters import filter_by_status, filter_by_type, filter_by_dual_type
 
 # TODO: dual types and status test
-# TODO: dDRY on SetUp
+# TODO: DRY on SetUp
 # TODO: dCheck what the null types got changed to
 
 # Set up dummy dataframe to test on
@@ -15,9 +15,10 @@ dummy_df = pd.DataFrame(
             "Squirtle",
             "Pidgey",
             "OmegaArmormon Burst Mode",
+            "OmegaArmormon Chaos Mode",
         ],
-        "type_1": ["Grass", "Fire", "Water", "Normal", "Normal"],
-        "type_2": ["Poison", None, None, "Flying", "Steel"],
+        "type_1": ["Grass", "Fire", "Water", "Normal", "Normal", "Normal"],
+        "type_2": ["Poison", None, None, "Flying", "Steel", "Steel"],
     }
 )
 
@@ -62,8 +63,8 @@ class TestFilterByDualTypes(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result.iloc[0]["name"], "OmegaArmormon Burst Mode")
 
-    def test_filter_by_types_no_matches(self):
-        result = filter_by_type(self.df, "Flying")
+    def test_filter_by_types_reverse_matches(self):
+        result = filter_by_dual_type(self.df, "Flying", "Normal")
         self.assertEqual(len(result), 1)
         self.assertEqual(result.iloc[0]["name"], "Pidgey")
 
