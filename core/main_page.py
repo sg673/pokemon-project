@@ -110,6 +110,15 @@ def main_page():
         "sp_attack",
         "sp_defense"
     ]].to_frame().T)
+    
+    weight_df = generate_random_rows(df, poke_info["pokedex_number"], 5)
+    fig = px.bar(
+        x = weight_df["name"],
+        y = weight_df["weight_kg"],
+        labels = {"name": "Name", "weight_kg": "Weight (kg)"},
+        text = "Weight (kg)"
+    )
+    st.plotly_chart(fig)
 
     radar_chart(poke_info)
 
